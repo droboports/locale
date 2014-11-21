@@ -21,8 +21,6 @@ errorfile="/tmp/DroboApps/${name}/error.txt"
 
 # app-specific variables
 prog_dir=$(dirname $(readlink -fn ${0}))
-inputfile="en_US"
-charmap="UTF-8"
 
 # script hardening
 set -o errexit  # exit on uncaught error code
@@ -42,31 +40,42 @@ echo $(date +"%Y-%m-%d %H-%M-%S"): ${0} ${@}
 # enable script tracing
 set -o xtrace
 
-if_mkdir() {
+_mkdir() {
   if [ ! -d "$1" ]; then mkdir -p "$1"; fi
 }
 
-if_link() {
+_link() {
   if [ ! -h "$1" ]; then ln -fs "$2" "$1"; fi
 }
 
-if_create_locale() {
-  local localecount
-  localecount=$("${prog_dir}/bin/locale" -a | wc -l)
-  if [[ ${localecount} -le 2 ]]; then
-    "${prog_dir}/bin/localedef" -f "${charmap}" -i "${inputfile}" "${inputfile}.${charmap}"
-  fi
+_create_locale() {
+  local locale inputfile charmap charalt exists
+  for loc in "${prog_dir}/etc/locale.d"/*; do
+    locale="$(basename ${loc})"
+    inputfile="$(echo $(basename ${loc}) | awk -F. '{print $1}')"
+    charmap="$(echo $(basename ${loc}) | awk -F. '{print $2}')"
+    if [[ "${charmap}" == "UTF-8" ]]; then
+      charalt="utf8"
+    else
+      charalt="${charmap}"
+    fi
+    if ("${prog_dir}/bin/localedef" --list-archive "${prog_dir}/usr/lib/locale/locale-archive" | grep -q "${inputfile}.${charalt}"); then
+      echo ${loc} already exists.
+    else
+      "${prog_dir}/bin/localedef" -f "${charmap}" -i "${inputfile}" "${locale}"
+    fi
+  done
 }
 
-start() {
-  if_mkdir "/usr/share"
-  if_mkdir "/usr/lib"
-  if_link "/usr/share/i18n" "${prog_dir}/usr/share/i18n"
-  if_link "/usr/lib/locale" "${prog_dir}/usr/lib/locale"
-  if_create_locale
+_start() {
+  _mkdir "/usr/share"
+  _mkdir "/usr/lib"
+  _link "/usr/share/i18n" "${prog_dir}/usr/share/i18n"
+  _link "/usr/lib/locale" "${prog_dir}/usr/lib/locale"
+  _create_locale
 }
 
-status() {
+_status() {
   local enabled running localecount
 
   if [[ -h "/usr/lib/locale" ]]; then
@@ -86,9 +95,9 @@ status() {
 }
 
 case "$1" in
-  start)   start ;;
+  start)   _start ;;
   stop)    ;;
-  restart) start ;;
-  status)  status ;;
+  restart) _start ;;
+  status)  _status ;;
   *) echo "Usage: $0 [start|stop|restart|status]" ; exit 1 ;;
 esac
