@@ -10,7 +10,7 @@ framework_version="2.0"
 
 # app description
 name="locale"
-version="2.5"
+version="2.11.1"
 description="Support for filenames with international characters."
 
 # framework-mandated variables
