@@ -10,7 +10,7 @@ framework_version="2.0"
 
 # app description
 name="locale"
-version="2.11.1"
+version="2.5"
 description="Support for filenames with international characters."
 
 # framework-mandated variables
@@ -41,11 +41,11 @@ echo $(date +"%Y-%m-%d %H-%M-%S"): ${0} ${@}
 set -o xtrace
 
 _mkdir() {
-  if [ ! -d "$1" ]; then mkdir -p "$1"; fi
+  if [[ ! -d "$1" ]]; then mkdir -p "$1"; fi
 }
 
 _link() {
-  if [ ! -h "$1" ]; then ln -fs "$2" "$1"; fi
+  if [[ ! -h "$1" ]]; then ln -fs "$2" "$1"; fi
 }
 
 _create_locale() {
