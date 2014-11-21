@@ -52,8 +52,8 @@ _create_locale() {
   local locale inputfile charmap charalt exists
   for loc in "${prog_dir}/etc/locale.d"/*; do
     locale="$(basename ${loc})"
-    inputfile="$(echo $(basename ${loc}) | awk -F. '{print $1}')"
-    charmap="$(echo $(basename ${loc}) | awk -F. '{print $2}')"
+    inputfile="$(echo ${locale} | awk -F. '{print $1}')"
+    charmap="$(echo ${locale} | awk -F. '{print $2}')"
     if [[ "${charmap}" == "UTF-8" ]]; then
       charalt="utf8"
     else
