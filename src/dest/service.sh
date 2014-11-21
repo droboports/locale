@@ -41,11 +41,11 @@ echo $(date +"%Y-%m-%d %H-%M-%S"): ${0} ${@}
 set -o xtrace
 
 _mkdir() {
-  if [ ! -d "$1" ]; then mkdir -p "$1"; fi
+  if [[ ! -d "$1" ]]; then mkdir -p "$1"; fi
 }
 
 _link() {
-  if [ ! -h "$1" ]; then ln -fs "$2" "$1"; fi
+  if [[ ! -h "$1" ]]; then ln -fs "$2" "$1"; fi
 }
 
 _create_locale() {
