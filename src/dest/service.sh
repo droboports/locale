@@ -7,7 +7,7 @@
 
 framework_version="2.1"
 name="locale"
-version="2.5"
+version="2.5.0-1"
 description="Support for filenames with international characters."
 depends=""
 webui=""
