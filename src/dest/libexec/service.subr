@@ -1,9 +1,9 @@
 # /etc/service.subr
-# 
+#
 # Provides some functions to support the service.sh script used by
 # DroboApps.
-# 
-# This should only be called from a DroboApp service.sh! 
+#
+# This should only be called from a DroboApp service.sh!
 #
 # This script follows Google's style guide for shell scripts. See more
 # information here:
@@ -666,13 +666,13 @@ _start_depend()
   fi
   # If it's not enabled, return 1.
   if ! _is_enabled "${_appName}"; then
-    eval echo "Dependency ${_appName} is not enabled."  ${STDERR}
+    eval echo \"Dependency ${_appName} is not enabled.\"  ${STDERR}
     _DEPENDS_STACK="${_oldStack}"
     return 1
   fi
   # If it isn't running, start it.
   if ! _is_app_running "${_appDir}"; then
-    eval echo "Starting dependency: ${_appName}"  ${STDOUT}
+    eval echo \"Starting dependency: ${_appName}\"  ${STDOUT}
     _prestart_app "${_appDir}"
     if [ -f "${_appDir}/service.sh" ]; then
       if (cd "${_appDir}" && $SH "${_appDir}/service.sh" start); then
@@ -761,7 +761,7 @@ _install_app()
   if [ -n "${_depends}" ]; then
     echo "Checking service dependencies for ${_tgzName}."
     if ! _start_depends ${_depends}; then
-      eval echo "Unable to start dependencies for ${_tgzName}." ${STDERR}
+      eval echo \"Unable to start dependencies for ${_tgzName}.\" ${STDERR}
       return 1
     fi
   fi
@@ -770,7 +770,7 @@ _install_app()
   # If the directory already exists, this is an upgrade and
   # untar on top of the existing install.
   if [ -d "${_appDir}" ]; then
-    eval echo "Upgrading ${_tgzName}."${STDOUT}
+    eval echo \"Upgrading ${_tgzName}.\" ${STDOUT}
     if $TAR -ztf "${_tgz}" update.sh > /dev/null 2>&1; then
       # There's an update.sh
       $TAR -zxf "${_tgz}" update.sh -C "${_appDir}"
@@ -778,7 +778,7 @@ _install_app()
       (cd "${_appDir}" && $SH "${_appDir}/update.sh" && $RM -f "${_appDir}/update.sh")
     fi
   else
-    eval echo "Installing ${_tgzName}." ${STDOUT}
+    eval echo \"Installing ${_tgzName}.\" ${STDOUT}
     $MKDIR -p "${_appDir}"
     $CP "/sys/devices/dri_dnas_primary/dnas_adp_1/driver/serial" "${_appDir}/host_uid.txt"
   fi
@@ -791,7 +791,7 @@ _install_app()
 
   # if there is an install.sh file, run it.
   if [ -f "${_appDir}/install.sh" ]; then
-    eval echo "Running post-install script for ${_tgzName}." ${STDOUT}
+    eval echo \"Running post-install script for ${_tgzName}.\" ${STDOUT}
     (cd "${_appDir}" && $SH "${_appDir}/install.sh" && $RM -f "${_appDir}/install.sh")
   fi
 
@@ -825,7 +825,7 @@ _uninstall_app()
   local _depend=""
 
   if [ ! -d "${_dir}" ]; then
-    eval echo "${_appName} is not installed." ${STDERR}
+    eval echo \"${_appName} is not installed.\" ${STDERR}
     return 1
   fi
 
@@ -838,7 +838,7 @@ _uninstall_app()
           _depends="$(_get_depends "${_appDir}")"
           if _contains_depend "${_depends}" "${_appName}"; then
             _depName="$(_get_app_name "${_appDir}")"
-            eval echo "Cannot uninstall ${1}: ${_depName} depends on it." ${STDERR}
+            eval echo \"Cannot uninstall ${1}: ${_depName} depends on it.\" ${STDERR}
             return 1
           fi
         fi
@@ -945,7 +945,7 @@ is_stopped()
 
 # _function_exists
 # $1: function name
-# return: 0 if function exists, 1 if not 
+# return: 0 if function exists, 1 if not
 # This function checks the existence of a shell function.
 _function_exists()
 {
@@ -977,13 +977,13 @@ start_service()
   local _appDir="$($DIRNAME "$($REALPATH "${0}")")"
   local _appName="$(_get_app_name "${_appDir}")"
 
+  _prestart_app "${_appDir}"
+
   # see if the service is already running
   if is_running "${pidfile:-}" "${daemon:-}"; then
-    eval echo "${_appName} is already running." ${STDERR}
+    eval echo \"${_appName} is already running.\" ${STDERR}
     return 1
   fi
-
-  _prestart_app "${_appDir}"
 
   # if there is an apache conf file, install it, and restart apache.
   if [ -f "${_appDir}/${_appName}.conf" ]; then
@@ -1027,9 +1027,9 @@ stop_service()
   local _retries=10
 
   if is_stopped "${pidfile:-}" "${daemon:-}"; then
-    eval echo "${_appName} is not running." ${STDERR}
+    eval echo \"${_appName} is not running.\" ${STDERR}
     return 1
-  fi 
+  fi
 
   # service is running
   if _function_exists "stop"; then
@@ -1126,7 +1126,7 @@ force_stop()
 # Service.sh can redefine this function as needed.
 restart()
 {
-  stop_service
+  stop_service || true
   start_service
 }
 
@@ -1197,7 +1197,7 @@ status()
     _running="stopped"
   fi
 
-  eval echo "${_appName} is ${_enabled} and ${_running}." ${STDOUT}
+  eval echo \"${_appName} is ${_enabled} and ${_running}\" ${STDOUT}
 }
 
 
@@ -1249,7 +1249,7 @@ usage()
   fi
 
   _message="${_message}]"
-  eval echo "${_message}" ${STDOUT}
+  eval echo \"${_message}\" ${STDOUT}
   exit 1
 }
 
