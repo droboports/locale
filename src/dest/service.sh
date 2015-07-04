@@ -21,6 +21,7 @@ errorfile="${tmp_dir}/error.txt"
 
 # backwards compatibility
 if [ -z "${FRAMEWORK_VERSION:-}" ]; then
+  framework_version="2.0"
   . "${prog_dir}/libexec/service.subr"
 fi
 
