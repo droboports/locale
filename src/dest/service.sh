@@ -61,6 +61,7 @@ start() {
   rm -f "${errorfile}"
   echo "Locale is configured." > "${statusfile}"
   touch "${pidfile}"
+  return 0
 }
 
 is_running() {
@@ -69,10 +70,12 @@ is_running() {
 
 stop() {
   rm -f "${pidfile}"
+  return 0
 }
 
 force_stop() {
   rm -f "${pidfile}"
+  return 0
 }
 
 # boilerplate
